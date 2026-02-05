@@ -1,0 +1,16 @@
+chroma_db/
+uploads/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+.env
+.venv
+*.log
+.pytest_cache/
+.coverage
+htmlcov/
+document_service_chromadb_backup.py

@@ -1,0 +1,342 @@
+# Troubleshooting Guide - AI Customer Service Platform
+
+## Common Issues and Solutions
+
+### Integration Issues
+
+#### Problem: API Authentication Failing
+
+**Symptoms:**
+- 401 Unauthorized errors
+- "Invalid API key" messages
+- Connection refused errors
+
+**Solutions:**
+
+1. **Verify API Key Format**
+   - API keys should be 32 characters alphanumeric
+   - Format: `AICS-xxxx-xxxx-xxxx-xxxx`
+   - Check for accidental spaces or line breaks
+
+2. **Check Key Status**
+   - Log in to dashboard.aiservice.com
+   - Navigate to Settings > API Keys
+   - Verify key status is "Active"
+   - Regenerate if status is "Expired" or "Revoked"
+
+3. **Validate Environment**
+   - Development keys work only in dev environment
+   - Production keys required for live environment
+   - Sandbox keys limited to 100 requests/day
+
+4. **Review Headers**
+   ```
+   Authorization: Bearer YOUR_API_KEY
+   Content-Type: application/json
+   ```
+
+#### Problem: Webhook Not Receiving Events
+
+**Symptoms:**
+- No webhook callbacks received
+- Events showing as "delivered" but not processed
+- Timeout errors in logs
+
+**Solutions:**
+
+1. **Verify Webhook URL**
+   - URL must be publicly accessible
+   - Must use HTTPS (not HTTP)
+   - Port must be open (typically 443)
+   - Test with: curl -X POST https://your-webhook-url
+
+2. **Check Webhook Signature**
+   - Verify HMAC signature validation
+   - Use correct secret key
+   - Check timestamp tolerance (5 minutes)
+
+3. **Review Response Requirements**
+   - Must return 200-299 status code within 30 seconds
+   - Empty response body is acceptable
+   - Avoid long processing in webhook handler
+
+4. **Retry Configuration**
+   - Failed webhooks retry 3 times (1h, 6h, 24h)
+   - Check webhook logs in dashboard
+   - Update webhook URL if consistently failing
+
+### Chat Widget Issues
+
+#### Problem: Chat Widget Not Loading
+
+**Symptoms:**
+- Widget doesn't appear on website
+- Console shows loading errors
+- Blank space where widget should be
+
+**Solutions:**
+
+1. **Check Script Installation**
+   ```html
+   <script async src="https://cdn.aiservice.com/chat-widget.js"></script>
+   <script>
+     window.AIChatWidget.init({
+       apiKey: 'YOUR_API_KEY',
+       position: 'bottom-right'
+     });
+   </script>
+   ```
+
+2. **Verify Domain Whitelist**
+   - Add your domain in Settings > Widget > Allowed Domains
+   - Include all subdomains if needed
+   - Remove protocol (https://) from domain list
+
+3. **Clear Cache**
+   - Clear browser cache
+   - Try incognito/private mode
+   - Check CDN status at status.aiservice.com
+
+4. **Check Content Security Policy**
+   - Add to your CSP headers:
+   ```
+   script-src 'self' https://cdn.aiservice.com;
+   connect-src 'self' https://api.aiservice.com;
+   ```
+
+#### Problem: Widget Showing Offline
+
+**Symptoms:**
+- Widget displays but shows "Currently offline"
+- No AI responses received
+- Error: "Service unavailable"
+
+**Solutions:**
+
+1. **Check Service Status**
+   - Visit status.aiservice.com
+   - Review your plan limits
+   - Verify account is active
+
+2. **Review Business Hours**
+   - Widget can be configured for business hours only
+   - Check Settings > Widget > Availability
+   - Update hours or enable 24/7 mode
+
+3. **Verify Model Status**
+   - Go to Settings > AI Model
+   - Check if model is "Active"
+   - Retrain if showing "Training failed"
+
+### AI Response Issues
+
+#### Problem: Inaccurate or Irrelevant Responses
+
+**Symptoms:**
+- AI gives wrong information
+- Responses don't match knowledge base
+- Generic answers instead of specific ones
+
+**Solutions:**
+
+1. **Update Knowledge Base**
+   - Add more relevant documents
+   - Remove outdated information
+   - Ensure documents are well-structured
+   - Recommended: 50+ documents minimum
+
+2. **Improve Document Quality**
+   - Use clear headings and sections
+   - Include FAQs in Q&A format
+   - Add examples and use cases
+   - Remove duplicate content
+
+3. **Adjust AI Settings**
+   - Settings > AI Model > Response Configuration
+   - Increase "Confidence Threshold" (0.7 → 0.85)
+   - Adjust "Context Window" (2 → 4 documents)
+   - Enable "Strict Mode" for critical information
+
+4. **Review Training Status**
+   - AI retrains automatically when documents change
+   - Manual retrain: Settings > AI Model > Retrain Now
+   - Training takes 10-30 minutes depending on data size
+
+#### Problem: AI Takes Too Long to Respond
+
+**Symptoms:**
+- Response time > 10 seconds
+- Timeout errors
+- Customers report slow performance
+
+**Solutions:**
+
+1. **Check Service Tier**
+   - Starter plan: Best effort
+   - Professional: < 3 seconds average
+   - Enterprise: < 1 second with dedicated resources
+   - Consider upgrading if consistently slow
+
+2. **Optimize Knowledge Base**
+   - Remove very large documents (>50MB)
+   - Split large files into smaller chunks
+   - Use text format instead of scanned PDFs
+   - Current limit: 1000 documents max
+
+3. **Review Query Complexity**
+   - Very long queries (>500 words) take longer
+   - Multiple questions in one query increase processing
+   - Encourage users to ask focused questions
+
+4. **Monitor API Rate Limits**
+   - Check dashboard for rate limit alerts
+   - Distribute load across multiple API keys if needed
+   - Consider caching common queries
+
+### Data and Analytics Issues
+
+#### Problem: Analytics Not Updating
+
+**Symptoms:**
+- Dashboard shows stale data
+- Conversation count not increasing
+- Reports show "No data available"
+
+**Solutions:**
+
+1. **Check Date Range**
+   - Default view shows last 7 days
+   - Adjust date picker to include all activity
+   - Note: Real-time data has 5-minute delay
+
+2. **Verify Tracking**
+   - Ensure widget/API is sending analytics events
+   - Check browser console for tracking errors
+   - Review Settings > Analytics > Event Tracking
+
+3. **Export and Import**
+   - Try exporting data to CSV
+   - If export works, it's a display issue
+   - Clear browser cache and retry
+   - Contact support if persistent
+
+### Account and Billing Issues
+
+#### Problem: Payment Failed
+
+**Symptoms:**
+- Email notification of failed payment
+- Account status showing "Past due"
+- Service interrupted
+
+**Solutions:**
+
+1. **Update Payment Method**
+   - Go to Billing > Payment Methods
+   - Update credit card information
+   - Verify billing address matches card
+   - Ensure card has sufficient funds
+
+2. **Retry Payment**
+   - Click "Retry Payment" in Billing section
+   - Payment processed immediately
+   - Account reactivated within 15 minutes
+
+3. **Contact Billing Support**
+   - Email: billing@aiservice.com
+   - Include: Account email, Invoice number
+   - Response time: 4 business hours
+
+#### Problem: Cannot Access Account
+
+**Symptoms:**
+- Login fails with correct password
+- "Account locked" message
+- Two-factor authentication issues
+
+**Solutions:**
+
+1. **Reset Password**
+   - Click "Forgot Password" on login page
+   - Check email (including spam folder)
+   - Reset link valid for 1 hour
+
+2. **Account Lockout**
+   - After 5 failed login attempts, account locks for 30 minutes
+   - Wait 30 minutes and try again
+   - Contact support for immediate unlock
+
+3. **Two-Factor Authentication**
+   - Use backup codes if phone unavailable
+   - Click "Having trouble?" on 2FA page
+   - Contact support to disable 2FA temporarily
+
+## Performance Optimization Tips
+
+### Best Practices for Fast Responses
+
+1. **Document Structure**
+   - Use markdown formatting
+   - Clear headings (H1, H2, H3)
+   - Bullet points for lists
+   - Code blocks for technical content
+
+2. **Ideal Document Size**
+   - 500-5000 words per document
+   - Split encyclopedia-style docs
+   - One topic per document
+
+3. **Update Frequency**
+   - Batch updates when possible
+   - Schedule retraining during low-traffic hours
+   - Use versioning for major changes
+
+4. **Query Design**
+   - Ask specific questions
+   - Include relevant keywords
+   - Avoid ambiguous terms
+
+### Monitoring and Alerts
+
+Set up alerts for:
+- Response time > 5 seconds
+- Error rate > 5%
+- Customer satisfaction < 4.0
+- API usage > 80% of limit
+
+Configure in Settings > Monitoring > Alerts
+
+## Getting Help
+
+### Support Channels
+
+1. **Documentation**: docs.aiservice.com
+2. **Email Support**: support@aiservice.com (24h response)
+3. **Priority Support**: priority@aiservice.com (4h response, Pro+)
+4. **Phone Support**: 1-800-AI-SUPPORT (Enterprise only)
+5. **Community Forum**: community.aiservice.com
+
+### When Contacting Support
+
+Include:
+- Account email address
+- Detailed description of issue
+- Steps to reproduce
+- Screenshots or error messages
+- Browser/device information
+- Time issue occurred (with timezone)
+
+### Emergency Contacts
+
+For critical issues (P1):
+- Slack: #critical-support (Enterprise)
+- Phone: 1-800-AI-URGENT
+- Email: urgent@aiservice.com
+
+Response time: 15 minutes for P1 issues
+
+---
+
+*Last Updated: February 2026*
+*Guide Version: 2.1*
+*Feedback: docs-feedback@aiservice.com*
