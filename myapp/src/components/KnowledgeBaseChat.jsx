@@ -22,6 +22,7 @@ export default function KnowledgeBaseChat() {
   const [isLoading, setIsLoading] = useState(false);
   const [showDocuments, setShowDocuments] = useState(false);
   const [apiStatus, setApiStatus] = useState('checking');
+  const [showConnectionPopup, setShowConnectionPopup] = useState(true);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -39,9 +40,16 @@ export default function KnowledgeBaseChat() {
   const checkApiStatus = async () => {
     try {
       const response = await axios.get(`${API_URL}/`);
-      setApiStatus(response.data.gemini_configured ? 'ready' : 'warning');
+      const status = response.data.gemini_configured ? 'ready' : 'warning';
+      setApiStatus(status);
+      // Hide popup only when API is ready
+      if (status === 'ready') {
+        setShowConnectionPopup(false);
+      }
     } catch (error) {
       setApiStatus('error');
+      // Hide popup on error too (after a delay to show the error status)
+      setTimeout(() => setShowConnectionPopup(false), 2000);
     }
   };
 
@@ -252,6 +260,120 @@ export default function KnowledgeBaseChat() {
           </>
         )}
       </div>
+
+      {/* API Connection Popup */}
+      <AnimatePresence>
+        {showConnectionPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-8 border border-gray-200 dark:border-gray-700"
+            >
+              <div className="flex flex-col items-center text-center">
+                {/* Animated Icon */}
+                <div className="relative mb-6">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                    className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center"
+                  >
+                    <Cog6ToothIcon className="w-10 h-10 text-white" />
+                  </motion.div>
+                  <motion.div
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                    className="absolute -inset-2 bg-blue-400/30 rounded-full -z-10"
+                  />
+                </div>
+
+                {/* Status Message */}
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                  {apiStatus === 'checking' ? 'Connecting to API...' : 
+                   apiStatus === 'ready' ? 'Connected Successfully!' :
+                   apiStatus === 'error' ? 'Connection Failed' : 'API Configuration Warning'}
+                </h3>
+                
+                <p className="text-gray-600 dark:text-gray-400 mb-2">
+                  {apiStatus === 'checking' ? 'For resource utilization, setting up may take up to 50 seconds...' :
+                   apiStatus === 'ready' ? 'Your knowledge base is ready to use!' :
+                   apiStatus === 'error' ? 'Unable to connect to the API server.' :
+                   'API key is not configured properly.'}
+                </p>
+
+                {/* Additional info for successful connection */}
+                {apiStatus === 'ready' && (
+                  <p className="text-sm text-blue-600 dark:text-blue-400 mt-3 bg-blue-50 dark:bg-blue-900/20 px-4 py-2 rounded-lg">
+                    📄 You can upload more documents (PDF) for knowledge base enhancement
+                  </p>
+                )}
+
+                {/* Loading Dots */}
+                {apiStatus === 'checking' && (
+                  <div className="flex gap-2 mt-4">
+                    <motion.div
+                      animate={{ y: [0, -10, 0] }}
+                      transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
+                      className="w-3 h-3 rounded-full bg-blue-500"
+                    />
+                    <motion.div
+                      animate={{ y: [0, -10, 0] }}
+                      transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }}
+                      className="w-3 h-3 rounded-full bg-indigo-500"
+                    />
+                    <motion.div
+                      animate={{ y: [0, -10, 0] }}
+                      transition={{ duration: 0.6, repeat: Infinity, delay: 0.4 }}
+                      className="w-3 h-3 rounded-full bg-purple-500"
+                    />
+                  </div>
+                )}
+
+                {/* Progress indicator for checking state */}
+                {apiStatus === 'checking' && (
+                  <div className="w-full mt-6">
+                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                      <motion.div
+                        animate={{ x: ['-100%', '100%'] }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+                        className="h-full w-1/3 bg-gradient-to-r from-blue-500 to-indigo-600"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Success/Error indicators */}
+                {apiStatus === 'ready' && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="mt-4 w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center"
+                  >
+                    <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </motion.div>
+                )}
+
+                {(apiStatus === 'error' || apiStatus === 'warning') && (
+                  <button
+                    onClick={() => setShowConnectionPopup(false)}
+                    className="mt-6 px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg font-medium hover:from-blue-600 hover:to-indigo-700 transition-all"
+                  >
+                    Continue Anyway
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
