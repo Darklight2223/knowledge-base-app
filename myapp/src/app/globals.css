@@ -1,2 +1,22 @@
 @import "tailwindcss";
 
+/* Force dark mode always */
+:root {
+  color-scheme: dark;
+}
+
+html {
+  background-color: #09090b;
+  color: white;
+}
+
+/* Fix input text color for dark mode */
+input, textarea {
+  color: white !important;
+  background-color: #18181b !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #71717a !important;
+}
+
