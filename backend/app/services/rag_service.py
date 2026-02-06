@@ -37,13 +37,19 @@ Respond briefly and friendly:"""
             )
             return QueryResponse(answer=response.text, sources=[], query=query)
         except Exception as e:
+            print(f"🔴 CASUAL RESPONSE ERROR: {type(e).__name__}: {e}")
             error_msg = str(e).lower()
-            if any(keyword in error_msg for keyword in ['exhausted', 'quota', 'rate limit', '429', 'resource']):
+            if any(keyword in error_msg for keyword in ['exhausted', 'quota', 'rate limit', '429']):
                 return QueryResponse(
                     answer="⚠️ **API Rate Limit Exhausted**\n\nPlease wait for **1 minute** before trying again.",
                     sources=[], query=query
                 )
-            return QueryResponse(answer="Hello! How can I help you with the knowledge base today?", sources=[], query=query)
+            if 'not found' in error_msg or 'invalid' in error_msg:
+                return QueryResponse(
+                    answer=f"⚠️ **Model Configuration Error**: {str(e)}\n\nPlease check the GEMINI_MODEL setting.",
+                    sources=[], query=query
+                )
+            return QueryResponse(answer=f"⚠️ Error: {str(e)}", sources=[], query=query)
     
     def generate_answer(self, query: str, top_k: int = None) -> QueryResponse:
         """Generate an answer using RAG"""
@@ -141,11 +147,18 @@ Please provide a well-structured answer with proper citations:"""
         except Exception as e:
             error_msg = str(e).lower()
             # Check for rate limit / quota exhausted errors
-            if any(keyword in error_msg for keyword in ['exhausted', 'quota', 'rate limit', '429', 'resource']):
+            if any(keyword in error_msg for keyword in ['exhausted', 'quota', 'rate limit', '429']):
                 print(f"⚠️ API limit exhausted: {e}")
                 return QueryResponse(
                     answer="⚠️ **API Rate Limit Exhausted**\n\nPlease wait for **1 minute** before trying again.",
                     sources=[],  # Don't show sources on rate limit
+                    query=query
+                )
+            if 'not found' in error_msg or 'invalid' in error_msg:
+                print(f"❌ Model error: {e}")
+                return QueryResponse(
+                    answer=f"⚠️ **Model Configuration Error**: {str(e)}\n\nPlease check the GEMINI_MODEL setting.",
+                    sources=[],
                     query=query
                 )
             answer = f"Error generating response: {str(e)}\n\nHowever, I found {len(sources)} relevant sources that might help answer your question."

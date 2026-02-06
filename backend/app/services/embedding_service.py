@@ -8,8 +8,9 @@ class EmbeddingService:
     def __init__(self):
         genai.configure(api_key=settings.GEMINI_API_KEY)
         self.model_name = settings.EMBEDDING_MODEL
-        self.dimension = 768  # text-embedding-004 outputs 768 dimensions
-        print(f"✅ Using Gemini embedding model: {self.model_name}")
+        # embedding-001: 3072 dims, text-embedding-004: 768 dims
+        self.dimension = 3072 if 'embedding-001' in self.model_name else 768
+        print(f"✅ Using Gemini embedding model: {self.model_name} ({self.dimension} dimensions)")
     
     def generate_embeddings(self, texts: List[str]) -> List[List[float]]:
         """Generate embeddings for a list of texts"""

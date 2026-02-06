@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     COLLECTION_NAME: str = "documents"
 
     # Gemini embedding model
-    EMBEDDING_MODEL: str = "models/text-embedding-004"
+    EMBEDDING_MODEL: str = "models/gemini-embedding-001"
     GEMINI_MODEL: str = "models/gemini-2.5-flash-lite"
     
     # RAG settings
