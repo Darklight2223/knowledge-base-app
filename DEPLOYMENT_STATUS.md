@@ -75,7 +75,7 @@ See **[VERCEL_DEPLOY.md](VERCEL_DEPLOY.md)** for:
 
 I noticed your API key in `.env.example`:
 ```
-GEMINI_API_KEY = AIzaSyA2ugeGf1DZHgNcwPD5lJtxOvou68cSunM
+GEMINI_API_KEY = your_gemini_api_key_here
 ```
 
 **⚠️ IMPORTANT**: This file is in `.gitignore` and won't be committed to Git. When deploying:

@@ -1,7 +1,11 @@
 import google.generativeai as genai
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Configure with your API key
-genai.configure(api_key="AIzaSyA2ugeGf1DZHgNcwPD5lJtxOvou68cSunM")
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 # List embedding models with full details
 print("Embedding Models Details:\n")

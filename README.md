@@ -2,6 +2,12 @@
 
 A full-stack AI-powered knowledge base platform with RAG (Retrieval Augmented Generation) capabilities, built with Next.js and FastAPI, powered by Google Gemini.
 
+## 🌐 Live Demo
+
+- **Frontend:** https://knowledge-base-app-2k5o.vercel.app/
+- **Backend API:** https://knowledge-base-app-1.onrender.com/
+- **API Docs:** https://knowledge-base-app-1.onrender.com/docs
+
 ![Knowledge Base Screenshot](https://via.placeholder.com/800x400/4F46E5/FFFFFF?text=AI+Knowledge+Base+Platform)
 
 ## 🚀 Features

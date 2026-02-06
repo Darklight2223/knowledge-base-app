@@ -58,8 +58,8 @@ git push -u origin main
    - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
 4. Environment Variables:
    ```
-   GEMINI_API_KEY=AIzaSyA2ugeGf1DZHgNcwPD5lJtxOvou68cSunM
-   MONGODB_URI=mongodb+srv://klk:Kanishk-05@knowledge-base.lpisiio.mongodb.net/?appName=knowledge-base
+   GEMINI_API_KEY=your_gemini_api_key_here
+   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/?appName=knowledge-base
    CORS_ORIGINS=https://your-app.vercel.app
    ```
 5. Click **Create Web Service**
